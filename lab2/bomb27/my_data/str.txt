@@ -1,0 +1,429 @@
+/lib64/ld-linux-x86-64.so.2
+fgets
+__printf_chk
+read
+alarm
+write
+connect
+__memmove_chk
+__libc_start_main
+__fprintf_chk
+strcmp
+socket
+signal
+fopen
+strcpy
+strtol
+strcasecmp
+__ctype_b_loc
+stdout
+puts
+gethostname
+fflush
+close
+strlen
+sleep
+getenv
+stdin
+gethostbyname
+__sprintf_chk
+stderr
+__errno_location
+exit
+__isoc99_sscanf
+__stack_chk_fail
+libc.so.6
+GLIBC_2.3
+GLIBC_2.7
+GLIBC_2.3.4
+GLIBC_2.4
+GLIBC_2.34
+GLIBC_2.2.5
+__gmon_start__
+PTE1
+AVAUATUSH
+D$X1
+\$ H
+D$(H
+T$0H
+D$8H
+T$@H
+D$HH
+D$XdH+
+`[]A\A]A^
+ATUSH
+[]A\
+T$@H
+***truncH
+ated***
+D$h1
+D$hdH+
+AVAUATUSI
+[]A\A]A^
+AWAVAUATUSL
+D$ L
+l$@H
+D$(I
+Error: CH
+lient unI
+able to H
+create sI
+G ockefA
+Error: DH
+NS is unI
+able to H
+resolve I
+server aI
+G(ddrefA
+G,ssA
+Error: UH
+nable toI
+ connectH
+ to the I
+G servfA
+G$erA
+Error: RH
+esult stI
+ring tooH
+ large. I
+IncreaseH
+ SUBMITRI
+_MAXBUF
+ t`A
+Error: CH
+lient unI
+able to H
+read firI
+st headeH
+r from sI
+G0ervefA
+[]A\A]A^A_
+Error: CH
+lient unI
+able to H
+read staI
+tus messH
+age fromI
+ server
+Error: CH
+lient unI
+able to H
+write toI
+ the serI
+G(ver
+Error: RH
+esult stI
+ring conH
+tains anI
+ illegalH
+ or unprI
+intable H
+characteI
+W8fA
+G@r.A
+t$8L
+L$0L
+D$(H
+|$PH
+D$`H
+D$XH
+L$<H
+D$<A
+Error: CH
+lient unI
+able to H
+read heaI
+ders froH
+m serverI
+ATUSH
+ []A\
+Error: CH
+lient unH
+able to H
+create sH
+E ockef
+Error: DH
+NS is unH
+able to H
+resolve H
+server aH
+E(ddref
+E,ss
+APRL
+%s: Error: Couldn't open %s
+Usage: %s [<input_file>]
+That's number 2.  Keep going!
+Halfway there!
+Good work!  On to the next...
+Welcome to my fiendish little bomb. You have 6 phases with
+which to blow yourself up. Have a nice day!
+Phase 1 defused. How about the next one?
+So you got that one.  Try this one.
+For NASA, space is still a high priority.
+Wow! You've defused the secret stage!
+%d %c %d
+devils
+maduiersnfotvbylSo you think you can stop the bomb with ctrl-c, do you?
+Initialization error: Running on an illegal host [1]
+Initialization error: Running on an illegal host [2]
+Your instructor has been notified.
+Curses, you've found the secret phase!
+But finding it and solving it are quite different...
+Congratulations! You've defused the bomb!
+Your instructor has been notified and will verify your solution.
+Well...
+OK. :-)
+Invalid phase%s
+Initialization error:
+defused
+exploded
+%d:%s:%d:%s
+BOOM!!!
+The bomb has blown up.
+%d %d %d %d %d %d
+Error: Premature EOF on stdin
+GRADE_BOMB
+Error: Input line too long
+%d %d %s
+DrEvil
+angelshark.ics.cs.cmu.edu
+makoshark.ics.cs.cmu.edu
+whaleshark.ics.cs.cmu.edu
+Program timed out after %d seconds
+Error: HTTP request failed with error %d: %s
+GET /%s/submitr.pl/?userid=%s&userpwd=%s&lab=%s&result=%s&submit=submit HTTP/1.0
+Error: Unable to connect to server %s
+%%%02X
+%s %d %[a-zA-z ]
+10.160.106.190
+AUTORESULT_STRING=%s
+csapp
+:*3$"
+m00uGBgH0vFshRw1NyRY
+B23040207
+GCC: (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+<Welcome to my fiendish little bomb. You have 6 phases with
+-which to blow yourself up. Have a nice day!
+*Phase 1 defused. How about the next one?
+That's number 2.  Keep going!
+Halfway there!
+%So you got that one.  Try this one.
+Good work!  On to the next...
+:!	;
+;!$9
+printf
+__off_t
+_IO_read_ptr
+_chain
+size_t
+_shortbuf
+_IO_buf_base
+long long unsigned int
+GNU C17 11.4.0 -mtune=generic -march=x86-64 -ggdb -O1 -fasynchronous-unwind-tables -fstack-protector-strong -fstack-clash-protection -fcf-protection
+read_line
+long long int
+phase_defused
+_fileno
+_IO_read_end
+_flags
+_IO_buf_end
+_cur_column
+_IO_codecvt
+__printf_chk
+_old_offset
+infile
+initialize_bomb
+_IO_marker
+stdin
+_freeres_buf
+_IO_write_ptr
+short unsigned int
+_IO_save_base
+_lock
+_flags2
+_mode
+__builtin_puts
+_IO_write_end
+_IO_lock_t
+_IO_FILE
+fopen
+_markers
+unsigned char
+short int
+_IO_wide_data
+_vtable_offset
+exit
+input
+__off64_t
+_IO_read_base
+_IO_save_end
+__fmt
+__pad5
+_unused2
+argv
+phase_1
+phase_2
+phase_3
+phase_4
+phase_5
+phase_6
+_IO_backup_base
+argc
+_freeres_list
+main
+_IO_write_base
+bomb.c
+/home/teacher/CSAPP/bomblab/src
+/usr/include/x86_64-linux-gnu/bits
+/usr/lib/gcc/x86_64-linux-gnu/11/include
+/usr/include/x86_64-linux-gnu/bits/types
+/usr/include
+stdio2.h
+stddef.h
+types.h
+struct_FILE.h
+stdio.h
+phases.h
+support.h
+stdlib.h
+<built-in>
+crt1.o
+__abi_tag
+crtstuff.c
+deregister_tm_clones
+__do_global_dtors_aux
+completed.0
+__do_global_dtors_aux_fini_array_entry
+frame_dummy
+__frame_dummy_init_array_entry
+bomb.c
+phases.c
+array.0
+support.c
+sig_handler
+driverlib.c
+rio_readlineb
+__FRAME_END__
+_DYNAMIC
+__GNU_EH_FRAME_HDR
+_GLOBAL_OFFSET_TABLE_
+skip
+getenv@GLIBC_2.2.5
+phase_defused
+strcasecmp@GLIBC_2.2.5
+__libc_start_main@GLIBC_2.34
+__errno_location@GLIBC_2.2.5
+stdout@GLIBC_2.2.5
+strcpy@GLIBC_2.2.5
+puts@GLIBC_2.2.5
+stdin@GLIBC_2.2.5
+write@GLIBC_2.2.5
+_edata
+_fini
+strlen@GLIBC_2.2.5
+__stack_chk_fail@GLIBC_2.4
+num_input_strings
+phase_5
+initialize_bomb_solve
+blank_line
+submitr
+phase_3
+phase_1
+invalid_phase
+init_driver
+alarm@GLIBC_2.2.5
+close@GLIBC_2.2.5
+node3
+read@GLIBC_2.2.5
+fgets@GLIBC_2.2.5
+explode_bomb
+node1
+__data_start
+strcmp@GLIBC_2.2.5
+signal@GLIBC_2.2.5
+gethostbyname@GLIBC_2.2.5
+node5
+__memmove_chk@GLIBC_2.3.4
+__gmon_start__
+strtol@GLIBC_2.2.5
+fun7
+__dso_handle
+_IO_stdin_used
+host_table
+func4
+string_length
+fflush@GLIBC_2.2.5
+__isoc99_sscanf@GLIBC_2.7
+_end
+_dl_relocate_static_pie
+secret_phase
+infile
+sigalrm_handler
+init_timeout
+__bss_start
+userid
+main
+__printf_chk@GLIBC_2.3.4
+read_line
+strings_not_equal
+phase_4
+fopen@GLIBC_2.2.5
+phase_6
+scratch
+driver_post
+send_msg
+phase_2
+gethostname@GLIBC_2.2.5
+exit@GLIBC_2.2.5
+bomb_id
+connect@GLIBC_2.2.5
+__TMC_END__
+__fprintf_chk@GLIBC_2.3.4
+node2
+node4
+user_password
+sleep@GLIBC_2.2.5
+node6
+_init
+read_six_numbers
+initialize_bomb
+__ctype_b_loc@GLIBC_2.3
+stderr@GLIBC_2.2.5
+__sprintf_chk@GLIBC_2.3.4
+socket@GLIBC_2.2.5
+.symtab
+.strtab
+.shstrtab
+.interp
+.note.gnu.property
+.note.gnu.build-id
+.note.ABI-tag
+.gnu.hash
+.dynsym
+.dynstr
+.gnu.version
+.gnu.version_r
+.rela.dyn
+.rela.plt
+.init
+.plt.sec
+.text
+.fini
+.rodata
+.eh_frame_hdr
+.eh_frame
+.init_array
+.fini_array
+.dynamic
+.got
+.got.plt
+.data
+.bss
+.comment
+.debug_aranges
+.debug_info
+.debug_abbrev
+.debug_line
+.debug_str
+.debug_line_str
+.debug_loclists

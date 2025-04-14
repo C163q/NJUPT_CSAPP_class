@@ -1,0 +1,15 @@
+b explode_bomb
+b *0x401ed0
+b *0x401ed1
+b *0x401ed2
+# b phase_1
+# b phase_2
+# b phase_3
+# b phase_4
+b phase_5
+b phase_6
+b secret_phase
+run B23040207.txt > output
+layout asm
+layout reg
+

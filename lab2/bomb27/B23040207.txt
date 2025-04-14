@@ -1,0 +1,8 @@
+For NASA, space is still a high priority.
+1 2 4 7 11 16
+1 i 492
+11 18
+beldog
+4 2 3 1 6 5
+value7
+
