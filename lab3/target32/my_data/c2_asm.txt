@@ -1,0 +1,10 @@
+
+c2_asm.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	bf e7 de 6a 27       	mov    $0x276adee7,%edi
+   5:	68 e1 1e 40 00       	push   $0x401ee1
+   a:	c3                   	ret    

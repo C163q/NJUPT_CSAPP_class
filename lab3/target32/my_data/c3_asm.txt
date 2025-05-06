@@ -1,0 +1,10 @@
+
+c3_asm.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	48 c7 c7 80 9d 61 55 	mov    $0x55619d80,%rdi
+   7:	68 fe 1f 40 00       	push   $0x401ffe
+   c:	c3                   	ret    

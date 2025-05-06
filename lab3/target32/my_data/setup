@@ -1,0 +1,20 @@
+set environment LD_PRELOAD=./printf.so
+b __isoc99_sscanf
+b fopen
+b Gets
+b 0x402191
+b test
+b getbuf
+b main
+b usage
+# b initialize_target
+# b stable_launch
+# b launch
+b touch1
+b touch2
+b touch3
+run < attack.txt ${ATTACKLAB_PARAM}
+layout asm
+layout reg
+
+
