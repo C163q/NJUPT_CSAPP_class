@@ -1,12 +1,13 @@
-set environment LD_PRELOAD=./printf.so
+# set environment LD_PRELOAD=./printf.so
 b __isoc99_sscanf
 b fopen
 b Gets
 b 0x402191
 b test
 b getbuf
-b main
+# b main
 b usage
+b validate
 # b initialize_target
 # b stable_launch
 # b launch
