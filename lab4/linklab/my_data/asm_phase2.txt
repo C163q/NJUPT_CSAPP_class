@@ -1,0 +1,44 @@
+
+phase2.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <do_phase>:
+   0:	f3 0f 1e fa          	endbr64
+   4:	55                   	push   %rbp
+   5:	48 89 e5             	mov    %rsp,%rbp
+   8:	48 83 ec 20          	sub    $0x20,%rsp
+   c:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
+  13:	00 00 
+  15:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+  19:	31 c0                	xor    %eax,%eax
+  1b:	48 b8 79 68 69 6a 65 	movabs $0x767372656a696879,%rax
+  22:	72 73 76 
+  25:	48 89 45 ee          	mov    %rax,-0x12(%rbp)
+  29:	66 c7 45 f6 71 00    	movw   $0x71,-0xa(%rbp)
+  2f:	c7 45 e8 00 00 00 00 	movl   $0x0,-0x18(%rbp)
+  36:	eb 24                	jmp    5c <do_phase+0x5c>
+  38:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  3b:	48 98                	cltq
+  3d:	0f b6 44 05 ee       	movzbl -0x12(%rbp,%rax,1),%eax
+  42:	0f b6 c0             	movzbl %al,%eax
+  45:	48 98                	cltq
+  47:	0f b6 80 00 00 00 00 	movzbl 0x0(%rax),%eax
+  4e:	0f be c0             	movsbl %al,%eax
+  51:	89 c7                	mov    %eax,%edi
+  53:	e8 00 00 00 00       	call   58 <do_phase+0x58>
+  58:	83 45 e8 01          	addl   $0x1,-0x18(%rbp)
+  5c:	8b 45 e8             	mov    -0x18(%rbp),%eax
+  5f:	83 f8 08             	cmp    $0x8,%eax
+  62:	76 d4                	jbe    38 <do_phase+0x38>
+  64:	bf 0a 00 00 00       	mov    $0xa,%edi
+  69:	e8 00 00 00 00       	call   6e <do_phase+0x6e>
+  6e:	90                   	nop
+  6f:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+  73:	64 48 2b 04 25 28 00 	sub    %fs:0x28,%rax
+  7a:	00 00 
+  7c:	74 05                	je     83 <do_phase+0x83>
+  7e:	e8 00 00 00 00       	call   83 <do_phase+0x83>
+  83:	c9                   	leave
+  84:	c3                   	ret

@@ -1,0 +1,25 @@
+
+main.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <main>:
+   0:	f3 0f 1e fa          	endbr64
+   4:	55                   	push   %rbp
+   5:	48 89 e5             	mov    %rsp,%rbp
+   8:	48 83 ec 10          	sub    $0x10,%rsp
+   c:	89 7d fc             	mov    %edi,-0x4(%rbp)
+   f:	48 89 75 f0          	mov    %rsi,-0x10(%rbp)
+  13:	48 8b 05 00 00 00 00 	mov    0x0(%rip),%rax        # 1a <main+0x1a>
+  1a:	48 85 c0             	test   %rax,%rax
+  1d:	74 10                	je     2f <main+0x2f>
+  1f:	48 8b 15 00 00 00 00 	mov    0x0(%rip),%rdx        # 26 <main+0x26>
+  26:	b8 00 00 00 00       	mov    $0x0,%eax
+  2b:	ff d2                	call   *%rdx
+  2d:	eb 0a                	jmp    39 <main+0x39>
+  2f:	bf 00 00 00 00       	mov    $0x0,%edi
+  34:	e8 00 00 00 00       	call   39 <main+0x39>
+  39:	b8 00 00 00 00       	mov    $0x0,%eax
+  3e:	c9                   	leave
+  3f:	c3                   	ret

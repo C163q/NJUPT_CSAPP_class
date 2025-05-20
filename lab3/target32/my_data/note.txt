@@ -44,7 +44,7 @@ fi
 
 unset ATTACKLAB_APP
 unset ATTACKLAB_PARAM
-```SHELL
+```
 由于有两个程序，所以我设置的是如果第一个参数是"c"就执行ctarget，如果第一个参数是"r"就执行rtarget。如果存在第二个参数就在程序的参数中加上"-q"。而my_data/setup中放着设置gdb的指令，比如设置断点什么的。这样就不用反复设置了，而且要改的话只要改这个文件就行了。
 
 phase1：

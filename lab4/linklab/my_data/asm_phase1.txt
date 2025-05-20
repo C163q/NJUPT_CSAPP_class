@@ -1,0 +1,16 @@
+
+phase1.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <do_phase>:
+   0:	f3 0f 1e fa          	endbr64
+   4:	55                   	push   %rbp
+   5:	48 89 e5             	mov    %rsp,%rbp
+   8:	b8 00 00 00 00       	mov    $0x0,%eax
+   d:	48 89 c7             	mov    %rax,%rdi
+  10:	e8 00 00 00 00       	call   15 <do_phase+0x15>
+  15:	90                   	nop
+  16:	5d                   	pop    %rbp
+  17:	c3                   	ret
