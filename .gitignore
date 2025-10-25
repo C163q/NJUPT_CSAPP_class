@@ -5,3 +5,6 @@
 *.docx
 *.zip
 **/tmp/
+
+# 由于不允许拷贝或使用archlab的内容，因此源文件archlab-handout.tar的内容一律ignore
+**/archlab-handout/

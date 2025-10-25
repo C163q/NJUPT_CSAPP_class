@@ -1,0 +1,300 @@
+好吧，首先一上来一大难题就是使用`make`报错。我的GCC编译器目前的版本是`15.2.1 20250813`，
+它默认用的是C23（或者是GNU23）标准，然后它的C语言源文件里有的语法在C23下会报错，所以编译
+会出问题。然后你得在它的`Makefile`文件里面在每个`CFLAGS`的最后加上`-std=gnu99`才行。
+
+OK，第一步是要求我们编写一个累加链表元素的Y86-64代码。
+```c
+/* linked list element */
+typedef struct ELE {
+    long val;
+    struct ELE *next;
+} *list_ptr;
+
+/* sum_list - Sum the elements of a linked list */
+long sum_list(list_ptr ls)
+{
+    long val = 0;
+    while (ls) {
+	val += ls->val;
+	ls = ls->next;
+    }
+    return val;
+}
+```
+
+先不急着编写，先看看给我们的Y86-64汇编示例是怎么写的。
+首先在很多ys文件中，我们都可以看见它以这样的几行打头：
+```ys
+# Execution begins at address 0
+    .pos 0
+    irmovq stack, %rsp  # Set up stack pointer
+    call main           # Execute main program
+    halt                # Terminate program
+```
+
+根据注释，我们可以很清楚这几行的意图：程序从0地址开始执行，设置%rsp为stack值，调用main函
+数，调用结束后halt。
+
+此处的stack在最后都有写：
+```ys
+# Stack starts here and grows to lower addresses
+    .pos 0x200
+stack:
+```
+
+接下来，可以看到很多文件都会定义一些数据结构，例如`asum.ys`中这样写：
+```ys
+# Array of 4 elements
+    .align 8
+array:  .quad 0x000d000d000d
+    .quad .0x000c000c000c
+    .quad .0x0b000b000b00
+    .quad .0x0a000a000a00
+```
+
+这是在定义一个4个元素的数组，`.align 8`指明对齐的方式，`array`指明定义一个数组。而`.quad`
+表明其中的元素是`四字`。
+
+再来看实验要求：
+```text
+编写一个y86-64程序sum.ys，迭代地对链表的元素求和。编写的程序应包括设置堆栈、调用函数，最
+后halt。使用以下三个元素的链表测试你编写的程序：
+    # Sample linked list
+    .align 8
+    ele1:
+    .quad 0x00a
+    .quad ele2
+    ele2:
+    .quad 0x0b0
+    .quad ele3
+    ele3:
+    .quad 0xc00
+    .quad 0
+```
+
+这样程序的开头就很清楚了：
+```ys
+# Execution begins at address 0
+    .pos 0
+    irmovq stack, %rsp  # Set up stack pointer
+    call main           # Execute main program
+    halt                # Terminate program
+
+# Sample linked list
+    .align 8
+ele1:
+    .quad 0x00a     # long val
+    .quad ele2      # struct ELE *next
+ele2:
+    .quad 0x0b0
+    .quad ele3
+ele3:
+    .quad 0xc00
+    .quad 0
+```
+
+接下来就是main函数了，它应该调用sum_list，并传入一个list_ptr，所以它应该是：
+```ys
+main:
+    irmovq ele1, %rdi
+    call sum_list
+    ret
+```
+
+最后就是sum_list了，由于Y86-64的简易性，所以很多操作不能直接完成，我们不妨先写一段更接近
+于汇编的C语言代码，帮助我们更方便的写出Y86-64汇编代码。
+
+```C
+long sum_list(list_ptr ls) {
+    void* rdi = ls;
+    long rax = 0;
+    long rsi;
+    void* rdx;
+    goto test;
+loop:
+    rsi = *(long*)rdi;  // ls->val
+    rax += rsi; // val += ls->val
+    rdx = *((void**)(rdi + 0x8));   // ls->next
+    rdi = rdx;  // ls = ls->next
+test:
+    if (rdi != 0)
+        goto loop;
+    return rax;
+}
+```
+
+现在将其翻译成Y86-64的语言：
+```ys
+# long sum_list(list_ptr ls)
+# ls in %rdi
+sum_list:
+    irmovq $0x8, %r8    # Constant 8
+    irmovq $0x0, %rax   # long val = 0;
+    jmp    test
+loop:
+    mrmovq (%rdi), %rsi     # ls->val
+    addq   %rsi, %rax       # val += ls->val
+    mrmovq 0x8(%rdi), %rdx  # ls->next
+    rrmovq %rdx, %rdi       # ls = ls->next
+test:
+    andq   %rdi, %rdi
+    jne    loop
+    ret
+```
+
+最后别忘了设置栈指针：
+```
+    .pos 0x200
+stack:
+```
+
+完成之后使用`make sum.yo`和`./yis sum.yo`，得到如下输出：
+```text
+Stopped in 30 steps at PC = 0x13.  Status 'HLT', CC Z=1 S=0 O=0
+Changes to registers:
+%rax:   0x0000000000000000      0x0000000000000cba
+%rsp:   0x0000000000000000      0x0000000000000200
+%rsi:   0x0000000000000000      0x0000000000000c00
+%r8:    0x0000000000000000      0x0000000000000008
+
+Changes to memory:
+0x01f0: 0x0000000000000000      0x000000000000005b
+0x01f8: 0x0000000000000000      0x0000000000000013
+```
+可以看见%rax是0xcba，说明计算的是对的。
+
+下一个函数是copy_block：
+```C
+/* copy_block - Copy src to dest and return xor checksum of src */
+long copy_block(long *src, long *dest, long len)
+{
+    long result = 0;
+    while (len > 0) {
+	long val = *src++;
+	*dest++ = val;
+	result ^= val;
+	len--;
+    }
+    return result;
+}
+```
+
+然后看一下实验要求：
+```text
+编写一个 y86-64 程序 copy.ys，将源块的一部分复制到另一部分，计算所复制的所有元素的校验和
+（xor）。编写程序应包括设置堆栈、调用函数 copy block 和 halt 指令。用下面数据测试编写的
+程序。
+    .align 8
+    # Source block
+    src:
+    .quad 0x00a
+    .quad 0x0b0
+    .quad 0xc00
+    # Destination block
+    dest:
+    .quad 0x111
+    .quad 0x222
+    .quad 0x333
+```
+
+同样可以给出程序开头：
+```ys
+# Execution begins at address 0
+    .pos 0
+    irmovq stack, %rsp  # Set up stack pointer
+    call main           # Execute main program
+    halt                # Terminate program
+
+    .align 8
+# Source block
+src:
+    .quad 0x00a
+    .quad 0x0b0
+    .quad 0xc00
+# Destination block
+dest:
+    .quad 0x111
+    .quad 0x222
+    .quad 0x333
+```
+
+至于main函数：
+```ys
+main:
+    irmovq src, %rdi
+    irmovq dest, %rsi
+    irmovq $3, %rdx
+    call copy_block     # copy_block(src, dest, 3)
+    ret
+```
+
+对于copy_block，还是写一段C语言代码作为中间代码。
+```C
+long copy_block(long* src, long* dest, long len) {
+    void* rdi = src;
+    void* rsi = dest;
+    long rdx = len;
+    long rax = 0;
+    long rcx;
+    goto test;
+loop:
+    rcx = *(long*)rdi;  // val = *src
+    rdi += 0x8;         // src++
+    *(long*)rsi = rcx;  // *dest = val
+    rsi += 0x8;         // dest++
+    rax ^= rcx;         // result ^= val
+    rdx -= 1;           // len--
+test:
+    if (rdx != 0)
+        goto loop;
+    return rax;
+}
+```
+
+将其翻译成Y86-64的语言：
+```ys
+# long copy_block(long *src, long *dest, long len)
+# src in %rdi, dest in %rsi, len in %rdx
+copy_block:
+    irmovq $0, %rax     # result = 0
+    irmovq $8, %r8      # Constant 8
+    irmovq $1, %r9      # Constant 1
+    andq   %rdx, %rdx   # Set CC
+    jmp    test
+loop:
+    mrmovq (%rdi), %rcx # val = *src
+    addq   %r8, %rdi    # src++
+    rmmovq %rcx, (%rsi) # *dest = val
+    addq   %r8, %rsi    # dest++
+    xorq   %rcx, %rax   # result ^= val
+    subq   %r9, %rdx    # len--
+test:
+    jne    loop
+    ret
+```
+
+最后设置栈指针：
+```ys
+    .pos 0x200
+stack:
+```
+
+完成之后使用`make copy.yo`和`./yis copy.yo`，得到如下输出：
+```ys
+Stopped in 36 steps at PC = 0x13.  Status 'HLT', CC Z=1 S=0 O=0
+Changes to registers:
+%rax:   0x0000000000000000      0x0000000000000cba
+%rcx:   0x0000000000000000      0x0000000000000c00
+%rsp:   0x0000000000000000      0x0000000000000200
+%rsi:   0x0000000000000000      0x0000000000000048
+%rdi:   0x0000000000000000      0x0000000000000030
+%r8:    0x0000000000000000      0x0000000000000008
+%r9:    0x0000000000000000      0x0000000000000001
+
+Changes to memory:
+0x0030: 0x0000000000000111      0x000000000000000a
+0x0038: 0x0000000000000222      0x00000000000000b0
+0x0040: 0x0000000000000333      0x0000000000000c00
+0x01f0: 0x0000000000000000      0x000000000000006f
+0x01f8: 0x0000000000000000      0x0000000000000013
+```
