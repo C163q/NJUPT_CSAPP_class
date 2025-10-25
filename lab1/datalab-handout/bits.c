@@ -2,8 +2,8 @@
  * CS:APP Data Lab 
  * 
  * <Please put your name and userid here>
- * name: 华宸浩
- * userid: B23040207
+ * name: XXX
+ * userid: B2304XXXX
  * 
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
